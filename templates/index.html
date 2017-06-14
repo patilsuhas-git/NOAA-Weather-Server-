@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>NOAA Weather Services </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    </head>
+    <body>
+        <form method="POST" class="latlong" action="#">
+            <input id='lat_txt' type="text" name="latitude" placeholder="Enter Latitude" value = "32.7357">
+            <input id='long_txt' type="text" name="longitude" placeholder="Enter Longitude" value = "-97.1081">
+            <!-- <input id="callout" type="submit" name="my-form" value="Get Weather Update"> -->
+            <button type="button" class="callout-button">Get Weather Update</button>
+        </form>
+        <p>North latitude is positive.West longitude is negative.</p>
+        <p>For Example: Arlington Latitude and Longitude : 32.7357(North)   -97.1081(West)</p>
+        <br/>
+        <br/>
+        <br/>
+        <div id="showmaximumtemp" style="block"></div>
+        <div id="showminimumtemp" style="block"></div>
+        <div id="showsky" style="block"></div>
+        <div id="showwindspeed" style="block"></div>
+        <div id="showwinddir" style="block"></div>
+        <div id="showwaveh" style="block"></div>
+        <div id="precipitate" style="block"></div>
+        <div id="showicons" style="block"></div>
+    </body>
+    <script>
+        $(document).ready(function() {
+            console.log('THis is doc ready index html');
+            $('.callout-button').click(function(event){
+                console.log('THis is button clicked');
+                event.preventDefault();
+                var longitude = '';
+                var latitude = '';
+                if($('#lat_txt').val() == "") {
+                    alert('Please enter latitude');
+                } else if ($('#long_txt').val() == "") {
+                    alert('Please enter longitude');
+                } else {
+                    var latlong_json = {
+                                            'latitude':$('#lat_txt').val(),
+                                            'longitude':$('#long_txt').val()
+                                        }
+                    console.log('This is just before callout call in jquery');
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ url_for('callout') }}",
+                        data: JSON.stringify($(".latlong").serialize()),
+                        contentType: "application/json;charset=UTF-8",
+                        success: function(result) {
+
+                            // $('#showData').append('<p>'+result+'</p>');
+                            console.log('THis is the data value ', result);
+                            var data = JSON.parse(result)["success"];
+                            if (data["temperature_maximum"] != undefined && data["temperature_maximum"] != "") {
+                                if (data["temperature_maximum"] == Array) {
+                                    $('#showmaximumtemp').html('<p> Maximum Temprature :'+ data["temperature_maximum"].join() +'</p>')
+                                } else {
+                                    $('#showmaximumtemp').html('<p> Maximum Temprature :'+ data["temperature_maximum"] +'</p>')
+                                }
+                            }
+
+                            if (data["temperature_minimum"] != undefined && data["temperature_minimum"] != "") {
+                                if (data["temperature_minimum"] == Array) {
+                                    $('#showminimumtemp').html('<p> Minimum Temprature :'+ data["temperature_minimum"].join() +'</p>')
+                                } else {
+                                    $('#showminimumtemp').html('<p> Minimum Temprature :'+ data["temperature_minimum"] +'</p>')
+                                }
+                            }
+
+                            if (data["wind_speed"] != undefined && data["wind_speed"] != "") {
+                                if (data["wind_speed"] == Array) {
+                                    $('#showwindspeed').html('<p> Wind Speed :'+ data["wind_speed"].join() +'</p>')
+                                } else {
+                                    $('#showwindspeed').html('<p> Wind Speed :'+ data["wind_speed"] +'</p>')
+                                }
+                            }
+
+                            if (data["direction"] != undefined && data["direction"] != "") {
+                                if (data["direction"] == Array) {
+                                    $('#showwinddir').html('<p> Wind Direction :'+ data["direction"].join() +'</p>')
+                                } else {
+                                    $('#showwinddir').html('<p> Wind Direction :'+ data["direction"] +'</p>')
+                                }
+                            }
+
+                            if (data["cloud-amount"] != undefined && data["cloud-amount"] != "") {
+                                if (data["cloud-amount"] == Array) {
+                                    $('#showsky').html('<p> Cloud Cover Amount :'+ data["cloud-amount"].join() +'</p>')
+                                } else {
+                                    $('#showsky').html('<p> Cloud Cover Amount :'+ data["cloud-amount"] +'</p>')
+                                }
+                            }
+
+                            if (data["probability-of-precipitation"] != undefined && data["probability-of-precipitation"] != "") {
+                                if (data["probability-of-precipitation"] == Array) {
+                                    $('#precipitate').html('<p> 12 Hour Probability of Precipitation :'+ data["probability-of-precipitation"].join() +'</p>')
+                                } else {
+                                    $('#precipitate').html('<p> 12 Hour Probability of Precipitation :'+ data["probability-of-precipitation"] +'</p>')
+                                }
+                            }
+
+                            if (data["conditions-icon"] != undefined && data["conditions-icon"] != "") {
+                                if (data["conditions-icon"] == Array) {
+                                    var imagestr = '';
+                                    for (i=0; i < data["conditions-icon"].length; i++) {
+                                         imagestr += "<img> src="+data["conditions-icon"][i] +"></img>";
+                                    }
+                                } else {
+                                    console.log('This is single value icon');
+                                    // var imageiconlst= data["conditions-icon"].split(", ");
+                                    console.log('This is the length of the imageiconlst ', data["conditions-icon"].length);
+                                    // $('#showicons').html('<img> src='+data["conditions-icon"] +'></img>');
+                                    var imagestr = '';
+                                    for (i=0; i < data["conditions-icon"].length; i++) {
+                                         imagestr += "<img src="+data["conditions-icon"][i] +"></img>";
+                                    }
+                                    console.log('This is imagestr', imagestr);
+                                }
+                                $('#showicons').html(imagestr);
+                            }
+                        },
+                        error: function(error) {
+                            console.log("There seems to be an error in the data you passed!");
+                        }
+                    });
+                }
+
+            });
+        });
+    </script>
+</hmtl>
