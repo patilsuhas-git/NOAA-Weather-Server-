@@ -1,5 +1,3 @@
-Student Name : Suhas Patil   Student MavId : 1001427002
-
 Use Unix, as I have developed and run code in Unix.
 IDE used : Atom
 Environment Required : Unix.
@@ -16,4 +14,4 @@ You should put latitude in first text box and longitude in second text box.
 
 Known issues :
 1. The callouts are made as per guided in https://graphical.weather.gov/xml/. But there are times
-when all the reuested weather parameters are not fetched from the server. 
+when all the reuested weather parameters are not fetched from the server.
